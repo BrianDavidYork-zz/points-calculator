@@ -8,9 +8,10 @@ import (
 
 // USER POINT STATE
 type Transaction struct {
-	Payer  string
-	Points int
-	Date   string
+	Payer     string
+	Points    int
+	Date      string
+	_DateTime time.Time
 }
 
 var Transactions []Transaction
@@ -36,15 +37,30 @@ func Add(res http.ResponseWriter, req *http.Request) {
 
 	// validate payer field
 	if t.Payer == "" {
-		r.Message = "Request body must contain a `payer` field"
+		r.Message = "Request body must contain a `Payer` field"
+		res.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(res).Encode(r)
+		return
+	}
+
+	// validate points field
+	if t.Points == 0 {
+		r.Message = "Request body must contain a `Points` field that is not 0"
 		res.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(res).Encode(r)
 		return
 	}
 
 	//  validate date field
+	// validate payer field
+	if t.Date == "" {
+		r.Message = "Request body must contain a `Date` field"
+		res.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(res).Encode(r)
+		return
+	}
 	const layoutIso = "01/02/2006 03PM"
-	_, err = time.Parse(layoutIso, t.Date)
+	dateTime, err := time.Parse(layoutIso, t.Date)
 	if err != nil {
 		r.Message = "Improperly formatted `date` field"
 		res.WriteHeader(http.StatusBadRequest)
@@ -52,8 +68,13 @@ func Add(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// append dateTime in new format
+	t._DateTime = dateTime
+
 	// add transaction to Transactions slice
 	Transactions = append(Transactions, t)
+
+	// sort transactions by _DateTime
 
 	// response
 	r.Message = "Points added"
@@ -62,25 +83,49 @@ func Add(res http.ResponseWriter, req *http.Request) {
 }
 
 func Deduct(res http.ResponseWriter, req *http.Request) {
-	type points struct {
+	type Deduct struct {
 		points int
 	}
+
+	d := Deduct{}
+	r := Response{}
+
 	// decode incoming into points struct
-	// make sure transactions are sorted by date
-	// calculate total points per payer (so that negative additions in the future do not cause payer to go negative)
+	err := json.NewDecoder(req.Body).Decode(&d)
+	if err != nil {
+		r.Message = "Could not decode request body"
+		res.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(res).Encode(r)
+		return
+	}
+
+	// calculate total points per payer (so that negative additions in the future do not cause player to go negative)
+	balance := getTotalPointsPerPayer()
+
 	// var deductions []Transaction
 	// find first transaction where points != 0
 	// deduct until points are exhausted, and create corresponding entry in deductions
 	// response
 }
 
-func Get(res http.ResponseWriter, req *http.Request) {
-	type totalPoints struct {
-		payer  string
-		points int
-	}
-	// loop through all transactions
-	// if totalPoints member with payer name doesnt exist, create it
-	// if it does exist, modify it to reflect new points value
+func Balance(res http.ResponseWriter, req *http.Request) {
+	r := Response{}
+
 	// response
+	r.Message = "Total points balance"
+	r.Data = getTotalPointsPerPayer()
+	res.WriteHeader(http.StatusOK)
+	json.NewEncoder(res).Encode(r)
+}
+
+func getTotalPointsPerPayer() (TotalPointsList map[string]int) {
+	for _, v := range Transactions {
+		_, ok := TotalPointsList[v.Payer]
+		if ok {
+			TotalPointsList[v.Payer] += v.Points
+		} else {
+			TotalPointsList[v.Payer] = v.Points
+		}
+	}
+	return
 }
