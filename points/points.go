@@ -100,7 +100,7 @@ func Deduct(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// calculate total points per payer (so that negative additions in the future do not cause player to go negative)
-	balance := getTotalPointsPerPayer()
+	// balance := getTotalPointsPerPayer()
 
 	// var deductions []Transaction
 	// find first transaction where points != 0
@@ -119,6 +119,7 @@ func Balance(res http.ResponseWriter, req *http.Request) {
 }
 
 func getTotalPointsPerPayer() (TotalPointsList map[string]int) {
+	TotalPointsList = make(map[string]int)
 	for _, v := range Transactions {
 		_, ok := TotalPointsList[v.Payer]
 		if ok {

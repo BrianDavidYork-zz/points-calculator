@@ -14,7 +14,7 @@ func main() {
 
 	router.HandleFunc("/points/add", points.Add).Methods("POST")
 	router.HandleFunc("/points/deduct", points.Deduct).Methods("POST")
-	router.HandleFunc("/points/points", points.Balance).Methods("GET")
+	router.HandleFunc("/points/balance", points.Balance).Methods("GET")
 
 	// start server
 	glog.Info("Starting Points api on port 8000")
