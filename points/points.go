@@ -11,7 +11,7 @@ type Transaction struct {
 	Payer     string
 	Points    int
 	Date      string
-	_DateTime time.Time
+	DateTime_ time.Time `json:"-"`
 }
 
 var Transactions []Transaction
@@ -52,7 +52,6 @@ func Add(res http.ResponseWriter, req *http.Request) {
 	}
 
 	//  validate date field
-	// validate payer field
 	if t.Date == "" {
 		r.Message = "Request body must contain a `Date` field"
 		res.WriteHeader(http.StatusBadRequest)
@@ -68,8 +67,8 @@ func Add(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// append dateTime in new format
-	t._DateTime = dateTime
+	// append dateTime in new format, set deducted to False
+	t.DateTime_ = dateTime
 
 	// add transaction to Transactions slice
 	Transactions = append(Transactions, t)
@@ -84,7 +83,7 @@ func Add(res http.ResponseWriter, req *http.Request) {
 
 func Deduct(res http.ResponseWriter, req *http.Request) {
 	type Deduct struct {
-		points int
+		Points int
 	}
 
 	d := Deduct{}
@@ -100,20 +99,50 @@ func Deduct(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// calculate total points per payer (so that negative additions in the future do not cause player to go negative)
-	// balance := getTotalPointsPerPayer()
+	balance := getTotalPointsPerPayer()
 
-	// var deductions []Transaction
-	// find first transaction where points != 0
-	// deduct until points are exhausted, and create corresponding entry in deductions
+	var deductions []Transaction
+	// loop through all point additions
+	for i, v := range Transactions {
+		// if payer has points to deduct and v.Points is positive (negative numbers are implicitly deducted)
+		if balance[v.Payer] > 0 && v.Points > 0 && d.Points > 0 {
+			// get deduct amount
+			var deductAmount int
+			if d.Points > balance[v.Payer] {
+				deductAmount = balance[v.Payer]
+			} else if d.Points < balance[v.Payer] {
+				deductAmount = d.Points
+			}
+			// subtract deductAmount from balance[v.Payer] (payer point total)
+			balance[v.Payer] -= deductAmount
+			// subtract deductAmount from v.Points         (transaction record)
+			Transactions[i].Points -= deductAmount
+			// subtract deductAmount from d.Points         (amount to be deducted from call)
+			d.Points -= deductAmount
+			// create new transaction and append to deductions
+			t := Transaction{}
+			t.Payer = Transactions[i].Payer
+			t.Points = -(deductAmount)
+			t.Date = "now"
+			deductions = append(deductions, t)
+		}
+	}
 	// response
+	r.Message = "Points deducted"
+	r.Data = deductions
+	res.WriteHeader(http.StatusOK)
+	json.NewEncoder(res).Encode(r)
 }
 
 func Balance(res http.ResponseWriter, req *http.Request) {
 	r := Response{}
 
+	// get points balance
+	balance := getTotalPointsPerPayer()
+
 	// response
 	r.Message = "Total points balance"
-	r.Data = getTotalPointsPerPayer()
+	r.Data = balance
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(r)
 }
@@ -130,3 +159,10 @@ func getTotalPointsPerPayer() (TotalPointsList map[string]int) {
 	}
 	return
 }
+
+// todo
+
+// sort transactions
+// check response message if 0 payer points left
+// check response data if payer goes down to 0 or below
+// how-to/readMe
