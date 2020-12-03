@@ -2,10 +2,16 @@ package main
 
 import (
 	"PointsCalculator/points"
+	"flag"
 	"github.com/golang/glog"
 	"github.com/gorilla/mux"
 	"net/http"
 )
+
+func init() {
+	flag.Set("logtostderr", "true")
+	flag.Parse()
+}
 
 func main() {
 	router := mux.NewRouter()
