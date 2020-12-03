@@ -73,8 +73,6 @@ func Add(res http.ResponseWriter, req *http.Request) {
 	// add transaction to Transactions slice
 	Transactions = append(Transactions, t)
 
-	// sort transactions by _DateTime
-
 	// response
 	r.Message = "Points added"
 	res.WriteHeader(http.StatusOK)
@@ -108,16 +106,16 @@ func Deduct(res http.ResponseWriter, req *http.Request) {
 		if balance[v.Payer] > 0 && v.Points > 0 && d.Points > 0 {
 			// get deduct amount
 			var deductAmount int
-			if d.Points > balance[v.Payer] {
+			if d.Points >= balance[v.Payer] {
 				deductAmount = balance[v.Payer]
 			} else if d.Points < balance[v.Payer] {
 				deductAmount = d.Points
 			}
-			// subtract deductAmount from balance[v.Payer] (payer point total)
+			// subtract deductAmount from balance[v.Payer]    (payer point total)
 			balance[v.Payer] -= deductAmount
-			// subtract deductAmount from v.Points         (transaction record)
+			// subtract deductAmount from v.Points            (transaction record)
 			Transactions[i].Points -= deductAmount
-			// subtract deductAmount from d.Points         (amount to be deducted from call)
+			// subtract deductAmount from d.Points            (amount to be deducted from call)
 			d.Points -= deductAmount
 			// create new transaction and append to deductions
 			t := Transaction{}
@@ -128,7 +126,11 @@ func Deduct(res http.ResponseWriter, req *http.Request) {
 		}
 	}
 	// response
-	r.Message = "Points deducted"
+	if len(deductions) == 0 {
+		r.Message = "No available points to deduct"
+	} else {
+		r.Message = "Points deducted"
+	}
 	r.Data = deductions
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(r)
@@ -159,10 +161,3 @@ func getTotalPointsPerPayer() (TotalPointsList map[string]int) {
 	}
 	return
 }
-
-// todo
-
-// sort transactions
-// check response message if 0 payer points left
-// check response data if payer goes down to 0 or below
-// how-to/readMe
