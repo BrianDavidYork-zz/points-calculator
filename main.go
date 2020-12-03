@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./points"
+	"PointsCalculator/points"
 	"github.com/golang/glog"
 	"github.com/gorilla/mux"
 	"net/http"
