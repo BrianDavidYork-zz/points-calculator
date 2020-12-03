@@ -9,7 +9,7 @@
 3) Use the cli to go to Go/src/PointsCalculator and execute "go install"
 
 4) After the installation finishes, execute "go run main.go" 
-   If the api starts, you will see the following log message appear: 
+   If the api starts, you will see the following log message appear:
    "Starting Points api on port 8000" 
    
 The PointsCalculator Api is now running on your localhost.
