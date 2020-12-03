@@ -3,6 +3,7 @@ package points
 import (
 	"encoding/json"
 	"net/http"
+	"sort"
 	"time"
 )
 
@@ -72,6 +73,11 @@ func Add(res http.ResponseWriter, req *http.Request) {
 
 	// add transaction to Transactions slice
 	Transactions = append(Transactions, t)
+
+	// sort by date
+	sort.Slice(Transactions, func(i, j int) bool {
+		return Transactions[i].DateTime_.Before(Transactions[j].DateTime_)
+	})
 
 	// response
 	r.Message = "Points added"
