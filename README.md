@@ -2,15 +2,14 @@
 
 1) Download Golang -- Follow the instructions found here: https://golang.org/doc/install
 
-2) Go will install in the home directory in a directory called Go/ 
-   Inside Go/ you will find another directory called src/ 
-   Download this project repository into src/ into a directory called PointsCalculator 
+2) Go will install in the home directory in a directory called Go/
+- Inside Go/ you will find another directory called src/
+- Download this project repository into src/ into a directory called PointsCalculator 
    
 3) Use the cli to go to Go/src/PointsCalculator and execute "go install"
 
 4) After the installation finishes, execute "go run main.go" 
-   If the api starts, you will see the following log message appear:
-   "Starting Points api on port 8000" 
+   - If the api starts, you will see the following log message appear: "Starting Points api on port 8000" 
    
 The PointsCalculator Api is now running on your localhost.
 
