@@ -1,3 +1,6 @@
+### This project was created as part of a a job application, according to guidelines specified by the company.
+
+
 ### SETUP INSTRUCTIONS ###
 
 1) Download Golang -- Follow the instructions found here: https://golang.org/doc/install
