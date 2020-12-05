@@ -112,9 +112,9 @@ func Deduct(res http.ResponseWriter, req *http.Request) {
 		if balance[v.Payer] > 0 && v.Points > 0 && d.Points > 0 {
 			// get deduct amount
 			var deductAmount int
-			if d.Points >= balance[v.Payer] {
-				deductAmount = balance[v.Payer]
-			} else if d.Points < balance[v.Payer] {
+			if d.Points >= v.Points {
+				deductAmount = v.Points
+			} else if d.Points < v.Points {
 				deductAmount = d.Points
 			}
 			// subtract deductAmount from balance[v.Payer]    (payer point total)
