@@ -9,7 +9,7 @@
 - Inside Go/ you will find another directory called src/
 - Download this project repository into src/ into a directory called PointsCalculator 
    
-3) Use the cli to go to Go/src/PointsCalculator and execute "go install"
+3) Use the cli to navigate to Go/src/PointsCalculator and execute "go install"
 
 4) After the installation finishes, execute "go run main.go" 
    - If the api starts, you will see the following log message appear: "Starting Points api on port 8000" 
@@ -36,7 +36,7 @@ The /add endoint takes a JSON body with 3 fields:
 }
 
 The date field must be in the following format:  "mm/dd/yyyy hhPM"
-All days, months, and hours must be two digits.  Febraury 5th 2020, 8 am would look like this: "02/05/2020 05AM"
+All days, months, and hours must be two digits.  Febraury 5th 2020, 8 am would look like this: "02/05/2020 08AM"
 An incorrectly formatted date will send back an error response from the server.
 
 The /deduct endpoint takes a JSON body with 1 field:
